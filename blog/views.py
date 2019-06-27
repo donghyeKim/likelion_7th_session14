@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import Blog
+from .forms import BlogPost
 
 def index(request):
     blogs = Blog.objects
@@ -20,3 +21,15 @@ def create(request):
     blog.pub_date = timezone.datetime.now()
     blog.save()
     return redirect('/blog/' + str(blog.id))
+    
+def blogpost(request):
+    if request.method =='POST':
+        form = BlogPost(request.POST)
+        if form.is_valid():
+            blog = form.save(commit=False)
+            blog.pub_date = timezone.now()
+            blog.save()
+            return redirect('/blog/' + str(blog.id))
+        else:
+            form = BlogPost()
+            return render(request,'new.html',{'form':form})
